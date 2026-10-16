@@ -298,6 +298,10 @@ void llama_model_qwen4exp::load_arch_tensors(llama_model_loader & ml) {
         nextn.hc_head_norm = create_tensor(tn(LLM_TENSOR_NEXTN_HC_HEAD_NORM, "weight", il), { n_embd, hc }, mtp_flags | TENSOR_ALLOW_RESHAPE);
         nextn.hc_head_down = create_tensor(tn(LLM_TENSOR_NEXTN_HC_HEAD_DOWN, "weight", il), { hc_dim, hc_lr }, mtp_flags);
         nextn.hc_head_up   = create_tensor(tn(LLM_TENSOR_NEXTN_HC_HEAD_UP,   "weight", il), { hc_lr, hc_dim }, mtp_flags);
+
+        // some files duplicate output.weight under the shared head name (the reference MTP head
+        // shares the trunk lm_head); this implementation reuses model.output, so ignore the copy
+        create_tensor(tn(LLM_TENSOR_NEXTN_SHARED_HEAD_HEAD, "weight", il), { n_embd, n_vocab }, TENSOR_NOT_REQUIRED | TENSOR_SKIP);
     }
 }
 
